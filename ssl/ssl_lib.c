@@ -2203,6 +2203,16 @@ int SSL_get_async_status(SSL *s, int *status)
     return 1;
 }
 
+int SSL_get_peer_addr(SSL *s, BIO_ADDR *addr) {
+    int ret = 0;
+#ifndef OPENSSL_NO_QUIC
+    if (IS_QUIC(s)) {
+        ret = ossl_quic_channel_get_peer_addr2(ossl_quic_conn_get_channel(s), addr);
+    }
+#endif
+    return ret;
+}
+
 int SSL_accept(SSL *s)
 {
     SSL_CONNECTION *sc = SSL_CONNECTION_FROM_SSL(s);

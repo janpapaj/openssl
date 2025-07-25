@@ -327,6 +327,7 @@ size_t ossl_quic_channel_get_short_header_conn_id_len(QUIC_CHANNEL *ch);
  * starting a channel in client mode.
  */
 int ossl_quic_channel_get_peer_addr(QUIC_CHANNEL *ch, BIO_ADDR *peer_addr);
+int ossl_quic_channel_get_peer_addr2(QUIC_CHANNEL *ch, BIO_ADDR *peer_addr);
 int ossl_quic_channel_set_peer_addr(QUIC_CHANNEL *ch, const BIO_ADDR *peer_addr);
 
 /*

@@ -516,6 +516,11 @@ int ossl_quic_channel_get_peer_addr(QUIC_CHANNEL *ch, BIO_ADDR *peer_addr)
     return BIO_ADDR_copy(peer_addr, &ch->cur_peer_addr);
 }
 
+int ossl_quic_channel_get_peer_addr2(QUIC_CHANNEL *ch, BIO_ADDR *peer_addr)
+{
+    return BIO_ADDR_copy(peer_addr, &ch->cur_peer_addr);
+}
+
 int ossl_quic_channel_set_peer_addr(QUIC_CHANNEL *ch, const BIO_ADDR *peer_addr)
 {
     if (ch->state != QUIC_CHANNEL_STATE_IDLE)
