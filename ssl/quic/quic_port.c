@@ -1469,6 +1469,22 @@ static void generate_new_token(QUIC_CHANNEL *ch, BIO_ADDR *peer)
     cleanup_validation_token(&token);
 }
 
+static inline int bio_addr_equal_ipv4(const BIO_ADDR *a,
+                                      const BIO_ADDR *b)
+{
+    uint32_t a_ip, b_ip;
+    uint16_t a_port, b_port;
+
+    BIO_ADDR_rawaddress(a, &a_ip, &(size_t){4});
+    BIO_ADDR_rawaddress(b, &b_ip, &(size_t){4});
+
+    a_port = BIO_ADDR_rawport(a);
+    b_port = BIO_ADDR_rawport(b);
+
+    return ((uint64_t)a_ip << 32 | a_port) ==
+           ((uint64_t)b_ip << 32 | b_port);
+}
+
 /*
  * This is called by the demux when we get a packet not destined for any known
  * DCID.
@@ -1499,6 +1515,16 @@ static void port_default_packet_handler(QUIC_URXE *e, void *arg,
         && ossl_quic_lcidm_lookup(port->lcidm, dcid, NULL,
                                   (void **)&ch)) {
         assert(ch != NULL);
+
+        if (!bio_addr_equal_ipv4(&e->peer, &ch->cur_peer_addr)) {
+            printf("#### %s updating peer addr\n", __func__);
+            if (!BIO_ADDR_copy(&ch->cur_peer_addr, &e->peer))
+                return ;
+
+            if (!ossl_quic_tx_packetiser_set_peer(ch->txp, &ch->cur_peer_addr))
+                return;
+        }
+
         ossl_quic_channel_inject(ch, e);
         return;
     }
